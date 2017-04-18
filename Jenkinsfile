@@ -2,13 +2,13 @@ pipeline {
 
 	agent any
 
-	/*tools {
-		maven 'Maven3'
-  }*/
-
   options {
     buildDiscarder(logRotator(numToKeepStr:'10')) // Keep the 10 most recent builds
   }
+
+	environment {
+		SONAR = credentials('sonar')
+	}
 
 	stages {
 
@@ -50,7 +50,7 @@ pipeline {
                   echo 'Run integration tests here...'
               },
               "sonarAnalysis" : {
-                  sh 'mvn sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.organization=cvitter-github -Dsonar.login=58ebe76411b8bef9fe0730201f583109005c505d'
+                  sh "mvn sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.organization=$SONAR_USR -Dsonar.login=$SONAR_PSW"
               }, failFast: true
         )
       }
