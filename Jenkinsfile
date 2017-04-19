@@ -54,7 +54,7 @@ pipeline {
 			}
 			post {
 				always {
-					sh 'docker stop $$(docker ps -q --filter ancestor="sample-rest-service") || true'
+					sh 'docker stop $(docker ps -q --filter ancestor="sample-rest-service") || true'
 				}
 			}
 		}
