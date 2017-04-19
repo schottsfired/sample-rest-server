@@ -34,11 +34,11 @@ pipeline {
 		}
 
 		stage('Build & Push Docker Image') {
-      when {
+			def BUILD_NUMBER = ${env.BUILD_NUMBER}
+			when {
         branch 'master'
       }
       steps {
-				def BUILD_NUMBER = ${env.BUILD_NUMBER}
         sh """
 					docker build \
 					-t sample-rest-service:0.0.$BUILD_NUMBER \
