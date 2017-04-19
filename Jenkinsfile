@@ -33,12 +33,16 @@ pipeline {
 		}
 
 		stage('Build & Push Docker Image') {
+			environment {
+				DOCKERHUB = credentials('dockerhub')
+			}
 			when {
 				branch 'master'
 			}
 			steps {
 				sh """
 					docker build -t schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD` .
+					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
 					docker push schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`
 				"""
 			}
