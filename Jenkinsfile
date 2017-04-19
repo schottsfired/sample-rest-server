@@ -50,8 +50,8 @@ pipeline {
 
 		stage('Deploy') {
 			steps {
-				sh 'docker stop $(docker ps -q --filter ancestor="sample-rest-service") || true'
-				sh 'docker run -d -p 4567:4567 --name=sample-rest-service schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`'
+				sh 'docker stop $(docker ps -q --filter ancestor="schottsfired/sample-rest-service") || true'
+				sh 'docker run -d -p 4567:4567 schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`'
 			}
 		}
 	}
