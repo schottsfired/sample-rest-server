@@ -40,8 +40,8 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh "docker build -t sample-rest-service:${DOCKER_TAG} ."
-				sh "docker push sample-rest-service:${DOCKER_TAG}"
+        sh "docker build -t sample-rest-service:$DOCKER_TAG ."
+				sh "docker push sample-rest-service:$DOCKER_TAG"
     	}
 		}
 	}
