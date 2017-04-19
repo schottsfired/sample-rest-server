@@ -50,20 +50,13 @@ pipeline {
 
 		stage('Deploy') {
 			steps {
-				try {
-					sh 'docker stop $$(docker ps -q --filter ancestor="sample-rest-service")'
-				}
-				catch (exc) {
-					echo "Failed to remove the active sample-rest-service, maybe it's not running right now.."
-				}
 				sh 'docker run -d -p 4567:4567 schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`'
+			}
+			post {
+				always {
+					sh 'docker stop $$(docker ps -q --filter ancestor="sample-rest-service") || true'
+				}
 			}
 		}
 	}
-
-	post {
-    always {
-      echo 'I will always say Hello in the post block!'
-    }
-  }
 }
