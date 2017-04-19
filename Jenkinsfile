@@ -41,8 +41,8 @@ pipeline {
       }
       steps {
         sh '''
-					docker build -t sample-rest-service:$DOCKER_TAG .
-					docker push sample-rest-service:$DOCKER_TAG
+					docker build -t sample-rest-service:\$DOCKER_TAG .
+					docker push sample-rest-service:\$DOCKER_TAG
 				'''
     	}
 		}
