@@ -37,12 +37,10 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				echo "Build & Push.."
-				//env.SHORT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD | cut -c1-7").trim()
-				//sh """
-				//	docker build -t sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT} .
-				//	docker push sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT}
-				//"""
+				sh """
+					docker build -t schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD` .
+					docker push schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`
+				"""
 			}
 		}
 
