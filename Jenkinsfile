@@ -12,56 +12,38 @@ pipeline {
 
 	stages {
 
-		stage('Build - Pull Request') {
-			when {
-				expression { (BRANCH_NAME.startsWith("PR")) }
-      }
-      steps {
-        sh 'mvn test'
-      }
-		}
-
-		stage('Build - Development') {
-			when {
-        branch 'development'
-      }
+		stage('Build') {
       steps {
         sh 'mvn clean package site'
-      }
-		}
-
-		stage('Build - Master') {
-			when {
-        branch 'master'
-      }
-      steps {
-        sh 'mvn clean package site'
+				junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
       }
 		}
 
 		stage('Quality Analysis') {
-			when {
-        branch 'master'
-      }
       steps {
         parallel (
-              "integrationTests" : {
+              "Integration Test" : {
                   // sh 'mvn verify'
                   echo 'Run integration tests here...'
               },
-              "sonarAnalysis" : {
+              "Sonar Scan" : {
                   sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.organization=$SONAR_USR -Dsonar.login=$SONAR_PSW"
               }, failFast: true
         )
       }
 		}
 
-		stage('Deploy') {
+		stage('Build & Push Docker Image') {
       when {
         branch 'master'
       }
       steps {
-        echo 'Here is where we deploy our code!'
+				def BUILD_NUMBER = ${env.BUILD_NUMBER}
+        sh """
+					docker build \
+					-t sample-rest-service:0.0.$BUILD_NUMBER \
+					.
+				"""
     	}
 		}
 	}
