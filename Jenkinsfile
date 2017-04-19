@@ -43,7 +43,7 @@ pipeline {
       steps {
         sh """
 					docker build \
-					-t sample-rest-service:$DOCKER_TAG \
+					-t sample-rest-service:${DOCKER_TAG} \
 					.
 				"""
     	}
