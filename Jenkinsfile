@@ -34,14 +34,16 @@ pipeline {
 		}
 
 		stage('Build & Push Docker Image') {
-			def BUILD_NUMBER = ${env.BUILD_NUMBER}
+			environment {
+				DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
+			}
 			when {
         branch 'master'
       }
       steps {
         sh """
 					docker build \
-					-t sample-rest-service:0.0.$BUILD_NUMBER \
+					-t sample-rest-service:$DOCKER_TAG \
 					.
 				"""
     	}
