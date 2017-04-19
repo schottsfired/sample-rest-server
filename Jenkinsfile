@@ -32,19 +32,23 @@ pipeline {
       }
 		}
 
-		stage('Build & Push Docker Image') {
-			environment {
-				DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
-			}
+	  stage('Build & Push Docker Image') {
 			when {
-        branch 'master'
-      }
+				branch 'master'
+			}
       steps {
-        sh '''
-					docker build -t sample-rest-service:\$DOCKER_TAG .
-					docker push sample-rest-service:\$DOCKER_TAG
-				'''
+				env.SHORT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD | cut -c1-7").trim()
+        sh """
+					docker build -t sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT} .
+					docker push sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT}
+				"""
     	}
+		}
+
+		stage('Deploy') {
+			steps {
+				echo "doing the deploy.."
+			}
 		}
 	}
 }
