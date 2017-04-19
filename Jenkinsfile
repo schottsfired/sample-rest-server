@@ -6,10 +6,6 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'10')) // Keep the 10 most recent builds
   }
 
-	environment {
-		SONAR = credentials('sonar')
-	}
-
 	stages {
 
 		stage('Build') {
@@ -20,6 +16,9 @@ pipeline {
 		}
 
 		stage('Quality Analysis') {
+			environment {
+				SONAR = credentials('sonar')
+			}
       steps {
         parallel (
               "Integration Test" : {
@@ -41,11 +40,8 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh """
-					docker build \
-					-t sample-rest-service:${DOCKER_TAG} \
-					.
-				"""
+        sh "docker build -t sample-rest-service:${DOCKER_TAG} ."
+				sh "docker push sample-rest-service:${DOCKER_TAG}"
     	}
 		}
 	}
