@@ -21,13 +21,13 @@ pipeline {
 			}
       steps {
         parallel (
-              "Integration Test" : {
-                  // sh 'mvn verify'
-                  echo 'Run integration tests here...'
-              },
-              "Sonar Scan" : {
-                  sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.organization=$SONAR_USR -Dsonar.login=$SONAR_PSW"
-              }, failFast: true
+          "Integration Test" : {
+            // sh 'mvn verify'
+            echo 'Run integration tests here...'
+          },
+          "Sonar Scan" : {
+            sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.organization=$SONAR_USR -Dsonar.login=$SONAR_PSW"
+          }, failFast: true
         )
       }
 		}
@@ -37,11 +37,12 @@ pipeline {
 				branch 'master'
 			}
       steps {
-				env.SHORT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD | cut -c1-7").trim()
-        sh """
-					docker build -t sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT} .
-					docker push sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT}
-				"""
+				echo "Build & Push.."
+				//env.SHORT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD | cut -c1-7").trim()
+        //sh """
+				//	docker build -t sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT} .
+				//	docker push sample-rest-service:${BUILD_NUMBER}-${SHORT_COMMIT}
+				//"""
     	}
 		}
 
