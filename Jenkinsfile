@@ -48,6 +48,9 @@ pipeline {
 		}
 
 		stage('Deploy') {
+			when {
+				branch 'master'
+			}
 			steps {
 				sh 'docker run -d -p 4567:4567 schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`'
 				input 'Does http://localhost:4567/hello look good?'
