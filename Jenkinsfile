@@ -26,7 +26,7 @@ pipeline {
 						echo 'Run integration tests here...'
 					},
 					"Sonar Scan" : {
-						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000"
+						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.login=$SONAR"
 					}, failFast: true
 				)
 			}
