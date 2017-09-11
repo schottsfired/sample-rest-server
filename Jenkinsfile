@@ -9,6 +9,7 @@ pipeline {
 	environment {
 		SONAR = credentials('sonar')
 		DOCKERHUB = credentials('dockerhub')
+		IMAGE_NAME = "schottsfired/sample-rest-server"
 		VERSION = "latest"
 	}
 
