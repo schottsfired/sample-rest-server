@@ -6,18 +6,33 @@ pipeline {
 		buildDiscarder(logRotator(numToKeepStr:'10')) // Keep the 10 most recent builds
 	}
 
+	environment {
+		SONAR = credentials('sonar')
+		DOCKERHUB = credentials('dockerhub')
+		VERSION = "latest"
+	}
+
 	stages {
-		stage('Build') {
+		stage('Version') {
 			steps {
-				sh 'mvn clean package site'
+				script {
+					VERSION = 
+						sh returnStdout: true,
+						script: "echo ${BUILD_NUMBER}-`git rev-parse HEAD`"
+						.trim()
+					echo "Set version to $VERSION"
+				}
+			}
+		}
+
+		stage('Build, Unit Test, Package') {
+			steps {
+				sh 'mvn clean package'
 				junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
 			}
 		}
 
 		stage('Quality Analysis') {
-			environment {
-				SONAR = credentials('sonar')
-			}
 			steps {
 				parallel (
 					"Integration Test" : {
@@ -32,17 +47,14 @@ pipeline {
 		}
 
 		stage('Build & Push Docker Image') {
-			environment {
-				DOCKERHUB = credentials('dockerhub')
-			}
 			when {
 				branch 'master'
 			}
 			steps {
 				sh """
-					docker build -t schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD` .
+					docker build -t schottsfired/sample-rest-service:$VERSION .
 					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
-					docker push schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`
+					docker push schottsfired/sample-rest-service:$VERSION
 				"""
 			}
 		}
@@ -52,12 +64,12 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				sh 'docker run -d -p 4567:4567 schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`'
+				sh 'docker run -d -p 4567:4567 schottsfired/sample-rest-service:$VERSION'
 				input 'Does http://localhost:4567/hello look good?'
 			}
 			post {
 				always {
-					sh 'docker stop $(docker ps -q --filter ancestor="schottsfired/sample-rest-service:${BUILD_NUMBER}-`git rev-parse HEAD`") || true'
+					sh 'docker stop $(docker ps -q --filter ancestor="schottsfired/sample-rest-service:$VERSION") || true'
 				}
 			}
 		}
