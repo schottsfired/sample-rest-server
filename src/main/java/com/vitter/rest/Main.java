@@ -2,6 +2,9 @@ package com.vitter.rest;
 
 import static spark.Spark.*;
 
+/**
+ * Hello World REST Server
+ */
 public class Main {
 	
 	// Unused variables to trigger PMD warnings

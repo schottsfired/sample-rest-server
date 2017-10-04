@@ -28,7 +28,7 @@ pipeline {
 
 		stage('Build, Unit, Package') {
 			steps {
-				sh 'mvn clean package'
+				sh 'mvn clean package site'
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
 			}
@@ -64,6 +64,16 @@ pipeline {
 						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
 					}, failFast: true
 				)
+			}
+		}
+
+		stage('Publish Docs') {
+			/*when {
+				branch 'master'
+			}*/
+			steps {
+				sh 'mvn site:site'
+				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
 			}
 		}
 

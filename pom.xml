@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project 
+	xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.vitter</groupId>
 	<artifactId>sample-rest-server</artifactId>
 	<version>0.0.1</version>
 	<name>Sample Rest Server</name>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -57,7 +58,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<reporting>
 		<plugins>
 			<plugin>
@@ -65,9 +65,13 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>3.7</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0-M1</version>
+			</plugin>
 		</plugins>
 	</reporting>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.sparkjava</groupId>
@@ -85,5 +89,4 @@
 			<version>1.7.24</version>
 		</dependency>
 	</dependencies>
-  
 </project>
