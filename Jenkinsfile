@@ -68,9 +68,9 @@ pipeline {
 		}
 
 		stage('Publish Docs') {
-			/*when {
+			when {
 				branch 'master'
-			}*/
+			}
 			steps {
 				sh 'mvn site:site'
 				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
