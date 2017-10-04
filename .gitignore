@@ -1,1 +1,7 @@
 /target/
+
+# VS Code
+.classpath
+.project
+.settings/
+.vscode/
