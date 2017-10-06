@@ -92,12 +92,12 @@ pipeline {
 
 	post {
 		always {
-			//Stop sample-rest-server
-			sh "docker ps -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker stop || true"
-			//Remove the container
-			sh "docker ps -a -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker rm || true"
-			//Remove the image
-			sh "docker images --format '{{.Repository}}:{{.Tag}}' | grep '^$IMAGE_NAME' | xargs docker rmi || true"
+			//Stop sample-rest-server, remove the container, remove the image
+			sh """
+				docker ps -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker stop || true
+				docker ps -a -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker rm || true
+				docker images --format '{{.Repository}}:{{.Tag}}' | grep '^$IMAGE_NAME' | xargs docker rmi || true
+			"""
 		}
 	}
 }
