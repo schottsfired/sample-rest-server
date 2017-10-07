@@ -11,7 +11,7 @@ pipeline {
 		SONAR = credentials('sonar')
 		DOCKERHUB = credentials('dockerhub')
 		IMAGE_NAME = "schottsfired/sample-rest-server"
-		IMAGE_VERSION = "latest"
+		IMAGE_TAG = "latest"
 		DOCKER_NETWORK = "cjt-network"
 	}
 
@@ -19,7 +19,7 @@ pipeline {
 		stage('Version') {
 			steps {
 				script {
-					IMAGE_VERSION = version()
+					IMAGE_TAG = version()
 				}
 			}
 		}
@@ -34,7 +34,7 @@ pipeline {
 
 		stage('Create Docker Image') {
 			steps {
-				sh "docker build -t $IMAGE_NAME:$IMAGE_VERSION ."
+				sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
 			}
 		}
 
@@ -51,7 +51,7 @@ pipeline {
 							--name sample-rest-server \
 							--network $DOCKER_NETWORK \
 							-p 4567:4567 \
-							$IMAGE_NAME:$IMAGE_VERSION
+							$IMAGE_NAME:$IMAGE_TAG
 						"""
 						//hit the /hello endpoint and collect result
 						retry(3) {
@@ -82,7 +82,7 @@ pipeline {
 			steps {
 				sh """
 					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
-					docker push $IMAGE_NAME:$IMAGE_VERSION
+					docker push $IMAGE_NAME:$IMAGE_TAG
 				"""
 			}
 		}
@@ -92,8 +92,8 @@ pipeline {
 		always {
 			//Stop sample-rest-server, remove the container, remove the image
 			sh """
-				docker ps -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker stop || true
-				docker ps -a -q --filter ancestor='$IMAGE_NAME:$IMAGE_VERSION' | xargs docker rm || true
+				docker ps -q --filter ancestor='$IMAGE_NAME:$IMAGE_TAG' | xargs docker stop || true
+				docker ps -a -q --filter ancestor='$IMAGE_NAME:$IMAGE_TAG' | xargs docker rm || true
 				docker images --format '{{.Repository}}:{{.Tag}}' | grep '^$IMAGE_NAME' | xargs docker rmi || true
 			"""
 		}
