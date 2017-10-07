@@ -11,19 +11,11 @@ pipeline {
 		SONAR = credentials('sonar')
 		DOCKERHUB = credentials('dockerhub')
 		IMAGE_NAME = "schottsfired/sample-rest-server"
-		IMAGE_TAG = "latest"
+		IMAGE_TAG = dockerImageTag()
 		DOCKER_NETWORK = "cjt-network"
 	}
 
 	stages {
-		stage('Version') {
-			steps {
-				script {
-					IMAGE_TAG = dockerImageTag()
-				}
-			}
-		}
-
 		stage('Build, Unit, Package') {
 			steps {
 				sh 'mvn clean package'
