@@ -19,7 +19,7 @@ pipeline {
 		stage('Version') {
 			steps {
 				script {
-					IMAGE_TAG = version()
+					IMAGE_TAG = dockerImageTag()
 				}
 			}
 		}
