@@ -1,3 +1,4 @@
+library 'github.com/schottsfired/pipeline-libraries'
 pipeline {
 
 	agent any
@@ -18,10 +19,7 @@ pipeline {
 		stage('Version') {
 			steps {
 				script {
-					IMAGE_VERSION = 
-						sh returnStdout: true,
-							script: "echo ${BUILD_NUMBER}-`git rev-parse HEAD` | tr -d '\n'"
-					echo "Set version to $IMAGE_VERSION"
+					IMAGE_VERSION = version()
 				}
 			}
 		}
