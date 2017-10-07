@@ -90,12 +90,7 @@ pipeline {
 
 	post {
 		always {
-			//Stop sample-rest-server, remove the container, remove the image
-			sh """
-				docker ps -q --filter ancestor='$IMAGE_NAME:$IMAGE_TAG' | xargs docker stop || true
-				docker ps -a -q --filter ancestor='$IMAGE_NAME:$IMAGE_TAG' | xargs docker rm || true
-				docker images --format '{{.Repository}}:{{.Tag}}' | grep '^$IMAGE_NAME' | xargs docker rmi || true
-			"""
+			dockerNuke(IMAGE_NAME, IMAGE_TAG)
 		}
 	}
 }
