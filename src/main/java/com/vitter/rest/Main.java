@@ -18,7 +18,7 @@ public class Main {
 		System.out.println("Hello World Example: http://localhost:4567/hello");
 		
 		// Basic Hello World get example:
-        get("/hello", (req, res) -> "Hello World!");
+        get("/hello", (req, res) -> "Que pasa!");
     }
 	
 }
