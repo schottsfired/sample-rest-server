@@ -47,8 +47,8 @@ pipeline {
 						"""
 						//hit the /hello endpoint and collect result
 						retry(3) {
+							sleep 2
 							sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
-							sleep 5
 						}
 						//store result
 						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
