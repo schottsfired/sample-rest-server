@@ -4,7 +4,8 @@ pipeline {
 	agent any
 
 	options {
-		buildDiscarder(logRotator(numToKeepStr:'10')) // Keep the 10 most recent builds
+		timestamps()
+		buildDiscarder(logRotator(numToKeepStr:'10')) //delete old builds
 	}
 
 	environment {
