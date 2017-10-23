@@ -19,6 +19,7 @@ pipeline {
 	stages {
 		stage('Build, Unit, Package') {
 			steps {
+				pwd()
 				sh 'mvn clean package'
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
