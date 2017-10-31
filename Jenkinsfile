@@ -9,7 +9,6 @@ pipeline {
 	}
 
 	environment {
-		SONAR = credentials('sonar')
 		DOCKERHUB = credentials('dockerhub')
 		IMAGE_NAME = "schottsfired/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
@@ -19,8 +18,9 @@ pipeline {
 	stages {
 		stage('Build, Unit, Package') {
 			steps {
-				pwd()
 				sh 'mvn clean package'
+				//work around for JENKINS-6268
+				sh "touch $WORKSPACE/target/surefire-reports/TEST-*.xml"
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
 			}
@@ -36,7 +36,7 @@ pipeline {
 			steps {
 				parallel (
 					"Sonar Scan" : {
-						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.login=$SONAR"
+						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000"
 					},
 					"Functional Test" : {
 						//fire up the app
