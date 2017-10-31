@@ -19,8 +19,6 @@ pipeline {
 		stage('Build, Unit, Package') {
 			steps {
 				sh 'mvn clean package'
-				//work around for JENKINS-6268
-				sh "touch $WORKSPACE/target/surefire-reports/TEST-*.xml"
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
 			}
