@@ -132,5 +132,8 @@ pipeline {
 			  	recipientProviders: [[$class: 'DevelopersRecipientProvider']]
 			)
 		}
+		failure {
+            		mail to: 'bmcconnell@cloudbees.com', subject: 'The Pipeline failed :('
+		}
 	}
 }
