@@ -2,8 +2,10 @@ library 'github.com/schottsfired/pipeline-libraries'
 pipeline {
 
 	agent {
-		label "docker"
-		image "maven"
+		docker {
+			label "docker"
+			image "maven"
+		}
 	}
 
 	options {
