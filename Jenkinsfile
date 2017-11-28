@@ -77,14 +77,9 @@ pipeline {
 					},
 					"Functional Test" : {
 						//fire up the app
-						//sh """
-						//	docker run -d \
-						//	--name sample-rest-server \
-						//	--network $DOCKER_NETWORK \
-						//	-p 4567:4567 \
+						//sh """docker run -d --name sample-rest-server	--network $DOCKER_NETWORK -p 4567:4567 \
 						//	$IMAGE_NAME:$IMAGE_TAG
 						//"""
-						//hit the /hello endpoint and collect result
 						retry(3) {
 							sleep 15
 							echo 'Functional Test completed successfully'
