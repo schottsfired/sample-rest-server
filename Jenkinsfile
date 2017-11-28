@@ -1,4 +1,4 @@
-library 'github.com/schottsfired/pipeline-libraries'
+//library 'github.com/schottsfired/pipeline-libraries'
 pipeline {
 
 	agent none
@@ -11,7 +11,7 @@ pipeline {
 	environment {
 		DOCKERHUB = credentials('emcconne_dockerhub')
 		IMAGE_NAME = "emcconne/sample-rest-server"
-		IMAGE_TAG = dockerImageTag()
+		IMAGE_TAG = "latest"
 		DOCKER_NETWORK = "cjt-network"
 	}
 
@@ -118,7 +118,7 @@ pipeline {
 
 	post {
 		always {
-			dockerNuke(IMAGE_NAME, IMAGE_TAG)
+			//dockerNuke(IMAGE_NAME, IMAGE_TAG)
 		}
 	}
 }
