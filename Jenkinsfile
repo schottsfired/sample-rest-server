@@ -81,22 +81,6 @@ pipeline {
 			}
 		}
 
-		stage('Publish Docs') {
-			agent {
-				docker {
-					label "docker"
-					image "maven"
-				}
-			}
-			when {
-				branch 'master'
-			}
-			steps {
-				sh 'mvn site:site'
-				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
-			}
-		}
-
 		stage('Push Docker Image') {
 			agent {
 				docker {
