@@ -1,7 +1,10 @@
 library 'github.com/schottsfired/pipeline-libraries'
 pipeline {
 
-	agent any
+	agent {
+		label "docker"
+		image "maven"
+	}
 
 	options {
 		timestamps()
