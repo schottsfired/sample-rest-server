@@ -4,7 +4,7 @@ pipeline {
 	agent {
 		docker {
 			label "docker"
-			image "maven"
+			image "emcconne/maven"
 		}
 	}
 
@@ -26,6 +26,7 @@ pipeline {
 				sh 'mvn clean package'
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+				stash includes: '**/target/*', name: 'assets'
 			}
 		}
 
