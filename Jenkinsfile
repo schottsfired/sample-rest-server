@@ -16,14 +16,15 @@ pipeline {
 	}
 
 	stages {
-		agent {
-			docker {
-				label "docker"
-				image "maven"
-				reuseNode true
-			}
-		}
+
 		stage('Build, Unit, Package') {
+			agent {
+				docker {
+					label "docker"
+					image "maven"
+					reuseNode true
+				}
+			}
 			steps {
 				sh 'mvn clean package'
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
