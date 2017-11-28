@@ -133,7 +133,7 @@ pipeline {
 			)
 		}
 		failure {
-            		mail to: 'bmcconnell@cloudbees.com', subject: 'The Pipeline failed :('
+            		mail to: 'bmcconnell@cloudbees.com', subject: 'The Pipeline failed :(', body: 'Pipeline failed'
 		}
 	}
 }
