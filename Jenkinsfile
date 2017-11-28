@@ -119,6 +119,7 @@ pipeline {
 	post {
 		always {
 			//dockerNuke(IMAGE_NAME, IMAGE_TAG)
+			echo "this is after everything has run"
 		}
 	}
 }
