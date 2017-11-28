@@ -89,10 +89,10 @@ pipeline {
 						retry(3) {
 							sleep 15
 							echo 'Functional Test completed successfully'
-							//sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
+							sh 'curl -v http://ident.me > functionalTest.txt'
 						}
 						//store result
-						//archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
+						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
 					}, failFast: true
 				)
 			}
