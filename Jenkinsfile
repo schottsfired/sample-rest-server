@@ -33,7 +33,7 @@ pipeline {
 			}
 		}
 
-		stage('Create Docker Image') {
+		stage('Provision Infra Resources') {
 			agent {
 				docker {
 					label "docker"
@@ -43,18 +43,19 @@ pipeline {
 			}
 			steps {
 				parallel (
-					"Build Application Docker Container" : {
-						unstash 'assets'
-						sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
-					},
-					"Secure Cloud Interconnect Service" : {
-						sh "echo 'Calling VES for provisioning of interconnect'"
-						sleep 10
-					},
-					"Provision AWS Resources for deployment" : {
-						sh "echo 'Provisioning AWS Resources for deployment'"
-						sleep 10
-					}
+						"Build Application Docker Container" : {
+							unstash 'assets'
+							sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+						},
+						"Secure Cloud Interconnect Service" : {
+							sh "echo 'Calling VES for provisioning of interconnect'"
+							sleep 10
+						},
+						"Provision AWS Resources for deployment" : {
+							sh "echo 'Provisioning AWS Resources for deployment'"
+							sleep 10
+						}, failFast: true
+					)
 				}
 			}
 		}
