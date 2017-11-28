@@ -57,7 +57,7 @@ pipeline {
 			steps {
 				parallel (
 					"Sonar Scan" : {
-						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000"
+						sh "mvn verify"
 					},
 					"Functional Test" : {
 						//fire up the app
