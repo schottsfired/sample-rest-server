@@ -10,7 +10,7 @@ pipeline {
 
 	environment {
 		DOCKERHUB = credentials('dockerhub')
-		IMAGE_NAME = "schottsfired/sample-rest-server"
+		IMAGE_NAME = "emcconne/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
 		DOCKER_NETWORK = "cjt-network"
 	}
