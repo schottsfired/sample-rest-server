@@ -109,6 +109,17 @@ pipeline {
 				"""
 			}
 		}
+		
+		stage('Opsani Deployment') {
+			agent any
+			when {
+				branch 'master'
+			}
+			steps {
+				echo "Calling Opsani for deployment of Docker container"
+				sleep 10
+			}
+		}
 	}
 
 	post {
