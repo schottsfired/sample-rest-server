@@ -9,7 +9,7 @@ pipeline {
 	}
 
 	environment {
-		DOCKERHUB = credentials('dockerhub')
+		DOCKERHUB = credentials('emcconne_dockerhub')
 		IMAGE_NAME = "emcconne/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
 		DOCKER_NETWORK = "cjt-network"
