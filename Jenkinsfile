@@ -118,9 +118,13 @@ pipeline {
 	}
 
 	post {
-		always {
-			//dockerNuke(IMAGE_NAME, IMAGE_TAG)
-			echo "this is after everything has run"
+		always {      
+			emailext (
+			  subject: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+			  body: """SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
+			    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+			  recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+			)
 		}
 	}
 }
