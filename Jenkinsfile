@@ -46,6 +46,23 @@ pipeline {
 				sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
 			}
 		}
+		
+		stage('Secure Cloud Interconnect Service') {
+			agent any
+			steps {
+				sh "echo 'Calling VES for provisioning of interconnect'"
+				sleep 10
+			}
+		}
+		
+		stage('Provisioning capacity in Amazon') {
+			agent any
+			steps {
+				sh "echo 'Provisioning AWS Resources for deployment'"
+				sleep 10
+			}
+		}		
+		
 
 		stage('Quality Analysis') {
 			agent {
