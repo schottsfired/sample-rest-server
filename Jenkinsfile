@@ -42,27 +42,22 @@ pipeline {
 				}
 			}
 			steps {
-				unstash 'assets'
-				sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+				parallel (
+					"Build Application Docker Container" : {
+						unstash 'assets'
+						sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+					},
+					"Secure Cloud Interconnect Service" : {
+						sh "echo 'Calling VES for provisioning of interconnect'"
+						sleep 10
+					},
+					"Provision AWS Resources for deployment" : {
+						sh "echo 'Provisioning AWS Resources for deployment'"
+						sleep 10
+					}
+				}
 			}
 		}
-		
-		stage('Secure Cloud Interconnect Service') {
-			agent any
-			steps {
-				sh "echo 'Calling VES for provisioning of interconnect'"
-				sleep 10
-			}
-		}
-		
-		stage('Provisioning capacity in Amazon') {
-			agent any
-			steps {
-				sh "echo 'Provisioning AWS Resources for deployment'"
-				sleep 10
-			}
-		}		
-		
 
 		stage('Quality Analysis') {
 			agent {
