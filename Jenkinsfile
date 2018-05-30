@@ -10,7 +10,7 @@ pipeline {
 
 	environment {
 		DOCKERHUB = credentials('dockerhub')
-		IMAGE_NAME = "mattelgin/sample-rest-server"
+		IMAGE_NAME = "$DOCKERHUB_USR/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
 		DOCKER_NETWORK = "cjt-network"
 	}
