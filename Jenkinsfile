@@ -17,21 +17,16 @@ pipeline {
 	}
 
 	stages {
-		stage('Build, Unit, Package') {
+		stage('Build') {
 			steps {
 				withMaven(mavenOpts: '-Djansi.force=true') {
 				    sh 'mvn clean package -Dstyle.color=always'
 			    }
-			}
-		}
-
-		stage('Create Docker Image') {
-			steps {
 				sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
 			}
 		}
 
-		stage('Quality Analysis') {
+		stage('Test') {
 			steps {
 				parallel (
 					"Sonar Scan" : {
@@ -60,7 +55,7 @@ pipeline {
 			}
 		}
 
-		stage('Publish Docs, Push Docker Image') {
+		stage('Deploy') {
 			when {
 				branch 'master'
 			}
