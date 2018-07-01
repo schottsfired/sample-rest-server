@@ -4,11 +4,12 @@ pipeline {
 	agent any
 
 	options {
-		buildDiscarder(logRotator(numToKeepStr:'10')) // Keep the 10 most recent builds
+		timestamps()
+		buildDiscarder(logRotator(numToKeepStr:'5')) //delete old builds
+		ansiColor('xterm')
 	}
 
 	environment {
-		SONAR = credentials('sonar')
 		DOCKERHUB = credentials('dockerhub')
 		IMAGE_NAME = "schottsfired/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
@@ -18,9 +19,9 @@ pipeline {
 	stages {
 		stage('Build, Unit, Package') {
 			steps {
-				sh 'mvn clean package'
-				junit testResults: '**/target/surefire-reports/TEST-*.xml'
-				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+				withMaven(mavenOpts: '-Djansi.force=true') {
+				    sh 'mvn clean package -Dstyle.color=always'
+			    }
 			}
 		}
 
@@ -34,7 +35,9 @@ pipeline {
 			steps {
 				parallel (
 					"Sonar Scan" : {
-						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar.beedemo.net:9000 -Dsonar.login=$SONAR"
+						withMaven(publisherStrategy: 'EXPLICIT', mavenOpts: '-Djansi.force=true') {
+				    		sh 'mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dstyle.color=always'
+			    		}
 					},
 					"Functional Test" : {
 						//fire up the app
@@ -52,30 +55,30 @@ pipeline {
 						}
 						//store result
 						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
-					}, failFast: true
+					}
 				)
 			}
 		}
 
-		stage('Publish Docs') {
+		stage('Publish Docs, Push Docker Image') {
 			when {
 				branch 'master'
 			}
 			steps {
-				sh 'mvn site:site'
-				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
-			}
-		}
-
-		stage('Push Docker Image') {
-			when {
-				branch 'master'
-			}
-			steps {
-				sh """
-					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
-					docker push $IMAGE_NAME:$IMAGE_TAG
-				"""
+				parallel (
+					"Publish Docs" : {
+						withMaven(publisherStrategy: 'EXPLICIT', mavenOpts: '-Djansi.force=true') {
+							sh 'mvn site -Dstyle.color=always'
+						}
+						publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/site', reportFiles: 'index.html', reportName: 'API Documentation', reportTitles: ''])
+					},
+					"Push Docker Image" : {
+						sh """
+							docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
+							docker push $IMAGE_NAME:$IMAGE_TAG
+						"""
+					}
+				)
 			}
 		}
 	}
