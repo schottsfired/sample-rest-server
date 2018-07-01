@@ -35,21 +35,30 @@ pipeline {
 			    		}
 					},
 					"Functional Test" : {
-						//fire up the app
-						sh """
-							docker run -d \
-							--name sample-rest-server \
-							--network $DOCKER_NETWORK \
-							-p 4567:4567 \
-							$IMAGE_NAME:$IMAGE_TAG
-						"""
-						//hit the /hello endpoint and collect result
-						retry(3) {
-							sleep 2
-							sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
+						lock('sample-rest-server') {
+							script {
+								try {
+									//fire up the app
+									sh """
+										docker run -d \
+										--name sample-rest-server \
+										--network $DOCKER_NETWORK \
+										-p 4567:4567 \
+										$IMAGE_NAME:$IMAGE_TAG
+									"""
+									//hit the /hello endpoint and collect result
+									retry(3) {
+										sleep 2
+										sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
+									}
+									//store result
+									archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
+								} finally {
+									//clean up
+									dockerNuke(IMAGE_NAME, IMAGE_TAG)
+								}
+							}
 						}
-						//store result
-						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
 					}
 				)
 			}
@@ -75,12 +84,6 @@ pipeline {
 					}
 				)
 			}
-		}
-	}
-
-	post {
-		always {
-			dockerNuke(IMAGE_NAME, IMAGE_TAG)
 		}
 	}
 }
