@@ -17,12 +17,11 @@ pipeline {
 	}
 
 	stages {
-		stage('Build, Unit, Package, Docs') {
+		stage('Build, Unit, Package') {
 			steps {
 				withMaven(mavenOpts: '-Djansi.force=true') {
-				    sh 'mvn clean package site -Dstyle.color=always'
+				    sh 'mvn clean package -Dstyle.color=always'
 			    }
-				publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/site', reportFiles: 'index.html', reportName: 'API Documentation', reportTitles: ''])
 			}
 		}
 
@@ -56,20 +55,30 @@ pipeline {
 						}
 						//store result
 						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
-					}, failFast: true
+					}
 				)
 			}
 		}
 
-		stage('Push Docker Image') {
+		stage('Publish Docs, Push Docker Image') {
 			when {
 				branch 'master'
 			}
 			steps {
-				sh """
-					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
-					docker push $IMAGE_NAME:$IMAGE_TAG
-				"""
+				parallel (
+					"Publish Docs" : {
+						withMaven(publisherStrategy: 'EXPLICIT', mavenOpts: '-Djansi.force=true') {
+							sh 'mvn site -Dstyle.color=always'
+						}
+						publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/site', reportFiles: 'index.html', reportName: 'API Documentation', reportTitles: ''])
+					},
+					"Push Docker Image" : {
+						sh """
+							docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
+							docker push $IMAGE_NAME:$IMAGE_TAG
+						"""
+					}
+				)
 			}
 		}
 	}
