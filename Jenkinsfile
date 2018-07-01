@@ -17,21 +17,16 @@ pipeline {
 	}
 
 	stages {
-		stage('Build, Unit, Package') {
+		stage('Build') {
 			steps {
 				withMaven(mavenOpts: '-Djansi.force=true') {
 				    sh 'mvn clean package -Dstyle.color=always'
 			    }
-			}
-		}
-
-		stage('Create Docker Image') {
-			steps {
 				sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
 			}
 		}
 
-		stage('Quality Analysis') {
+		stage('Test') {
 			steps {
 				parallel (
 					"Sonar Scan" : {
@@ -40,27 +35,36 @@ pipeline {
 			    		}
 					},
 					"Functional Test" : {
-						//fire up the app
-						sh """
-							docker run -d \
-							--name sample-rest-server \
-							--network $DOCKER_NETWORK \
-							-p 4567:4567 \
-							$IMAGE_NAME:$IMAGE_TAG
-						"""
-						//hit the /hello endpoint and collect result
-						retry(3) {
-							sleep 2
-							sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
+						lock('sample-rest-server') {
+							script {
+								try {
+									//fire up the app
+									sh """
+										docker run -d \
+										--name sample-rest-server \
+										--network $DOCKER_NETWORK \
+										-p 4567:4567 \
+										$IMAGE_NAME:$IMAGE_TAG
+									"""
+									//hit the /hello endpoint and collect result
+									retry(3) {
+										sleep 2
+										sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
+									}
+									//store result
+									archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
+								} finally {
+									//clean up
+									dockerNuke(IMAGE_NAME, IMAGE_TAG)
+								}
+							}
 						}
-						//store result
-						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
 					}
 				)
 			}
 		}
 
-		stage('Publish Docs, Push Docker Image') {
+		stage('Deploy') {
 			when {
 				branch 'master'
 			}
@@ -80,12 +84,6 @@ pipeline {
 					}
 				)
 			}
-		}
-	}
-
-	post {
-		always {
-			dockerNuke(IMAGE_NAME, IMAGE_TAG)
 		}
 	}
 }
