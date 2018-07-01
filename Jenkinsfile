@@ -6,6 +6,7 @@ pipeline {
 	options {
 		timestamps()
 		buildDiscarder(logRotator(numToKeepStr:'10')) //delete old builds
+		ansiColor('xterm')
 	}
 
 	environment {
@@ -18,7 +19,9 @@ pipeline {
 	stages {
 		stage('Build, Unit, Package') {
 			steps {
-				sh 'mvn clean package'
+				withMaven(mavenOpts: '-Djansi.force=true') {
+				    sh 'mvn clean package -Dstyle.color=always'
+			    }
 				junit testResults: '**/target/surefire-reports/TEST-*.xml'
 				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
 			}
@@ -34,7 +37,9 @@ pipeline {
 			steps {
 				parallel (
 					"Sonar Scan" : {
-						sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000"
+						withMaven(mavenOpts: '-Djansi.force=true') {
+				    		sh 'mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dstyle.color=always'
+			    		}
 					},
 					"Functional Test" : {
 						//fire up the app
@@ -62,7 +67,9 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				sh 'mvn site:site'
+				withMaven(mavenOpts: '-Djansi.force=true') {
+				    sh 'mvn site -Dstyle.color=always'
+			    }
 				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
 			}
 		}
