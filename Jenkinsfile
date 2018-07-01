@@ -5,7 +5,7 @@ pipeline {
 
 	options {
 		timestamps()
-		buildDiscarder(logRotator(numToKeepStr:'10')) //delete old builds
+		buildDiscarder(logRotator(numToKeepStr:'5')) //delete old builds
 		ansiColor('xterm')
 	}
 
@@ -22,8 +22,6 @@ pipeline {
 				withMaven(mavenOpts: '-Djansi.force=true') {
 				    sh 'mvn clean package -Dstyle.color=always'
 			    }
-				junit testResults: '**/target/surefire-reports/TEST-*.xml'
-				archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
 			}
 		}
 
@@ -37,7 +35,7 @@ pipeline {
 			steps {
 				parallel (
 					"Sonar Scan" : {
-						withMaven(mavenOpts: '-Djansi.force=true') {
+						withMaven(publisherStrategy: 'EXPLICIT', mavenOpts: '-Djansi.force=true') {
 				    		sh 'mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dstyle.color=always'
 			    		}
 					},
@@ -57,32 +55,30 @@ pipeline {
 						}
 						//store result
 						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
-					}, failFast: true
+					}
 				)
 			}
 		}
 
-		stage('Publish Docs') {
+		stage('Publish Docs, Push Docker Image') {
 			when {
 				branch 'master'
 			}
 			steps {
-				withMaven(mavenOpts: '-Djansi.force=true') {
-				    sh 'mvn site -Dstyle.color=always'
-			    }
-				step([$class: 'JavadocArchiver', javadocDir: 'target/site/apidocs', keepAll: false])
-			}
-		}
-
-		stage('Push Docker Image') {
-			when {
-				branch 'master'
-			}
-			steps {
-				sh """
-					docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
-					docker push $IMAGE_NAME:$IMAGE_TAG
-				"""
+				parallel (
+					"Publish Docs" : {
+						withMaven(publisherStrategy: 'EXPLICIT', mavenOpts: '-Djansi.force=true') {
+							sh 'mvn site -Dstyle.color=always'
+						}
+						publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'target/site', reportFiles: 'index.html', reportName: 'API Documentation', reportTitles: ''])
+					},
+					"Push Docker Image" : {
+						sh """
+							docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
+							docker push $IMAGE_NAME:$IMAGE_TAG
+						"""
+					}
+				)
 			}
 		}
 	}
