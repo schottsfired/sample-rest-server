@@ -1,4 +1,4 @@
-library 'github.com/schottsfired/pipeline-libraries'
+library 'github.com/cloudy-demos/pipeline-libraries'
 pipeline {
 
 	agent any
