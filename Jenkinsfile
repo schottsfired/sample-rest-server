@@ -38,7 +38,7 @@ pipeline {
 						//fire up the app
 						sh """
 							docker run -d \
-							--name sample-rest-server-$IMAGE_NAME \
+							--name sample-rest-server-$IMAGE_TAG \
 							--network $DOCKER_NETWORK \
 							-p 4567:4567 \
 							$IMAGE_NAME:$IMAGE_TAG
