@@ -1,4 +1,4 @@
-library 'github.com/schottsfired/pipeline-libraries'
+library 'github.com/cloudy-demos/pipeline-libraries'
 pipeline {
 
 	agent any
@@ -11,7 +11,7 @@ pipeline {
 
 	environment {
 		DOCKERHUB = credentials('dockerhub')
-		IMAGE_NAME = "schottsfired/sample-rest-server"
+		IMAGE_NAME = "$DOCKERHUB_USR/sample-rest-server"
 		IMAGE_TAG = dockerImageTag()
 		DOCKER_NETWORK = "cjt-network"
 	}
