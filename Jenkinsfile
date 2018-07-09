@@ -35,23 +35,21 @@ pipeline {
 			    		}
 					},
 					"Functional Test" : {
-						lock('sample-rest-server') {
-							//fire up the app
-							sh """
-								docker run -d \
-								--name sample-rest-server \
-								--network $DOCKER_NETWORK \
-								-p 4567:4567 \
-								$IMAGE_NAME:$IMAGE_TAG
-							"""
-							//hit the /hello endpoint and collect result
-							retry(3) {
-								sleep 2
-								sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
-							}
-							//store result
-							archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
+						//fire up the app
+						sh """
+							docker run -d \
+							--name sample-rest-server-$IMAGE_NAME \
+							--network $DOCKER_NETWORK \
+							-p 4567:4567 \
+							$IMAGE_NAME:$IMAGE_TAG
+						"""
+						//hit the /hello endpoint and collect result
+						retry(3) {
+							sleep 2
+							sh 'curl -v http://sample-rest-server:4567/hello > functionalTest.txt'
 						}
+						//store result
+						archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
 					}
 				)
 			}
