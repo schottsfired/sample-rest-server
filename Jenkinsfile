@@ -51,6 +51,12 @@ pipeline {
 							}
 							//store result
 							archiveArtifacts artifacts: 'functionalTest.txt', fingerprint: true
+
+							//stop and remove container
+							sh """
+								docker stop sample-rest-server || true
+								docker rm sample-rest-server || true
+							"""
 						}
 					}
 				)
